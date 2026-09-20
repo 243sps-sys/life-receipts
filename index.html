@@ -3,853 +3,1141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Life Receipts — Your Life, In Receipts</title>
+<title>Life Receipts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg: #f5f1e8;
-  --paper: #fffdf7;
-  --ink: #171717;
-  --muted: #77736b;
-  --line: #ded8ca;
-  --accent: #222;
-  --soft: #ece7dc;
-  --green: #6d806d;
-  --red: #9b625a;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-.app { display: flex; min-height: 100vh; }
-.sidebar {
-  width: 250px;
-  background: #171717;
-  color: #fff;
-  padding: 28px 20px;
-  position: fixed;
-  inset: 0 auto 0 0;
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-}
-.brand { font-family: Georgia, serif; font-size: 25px; margin: 0 0 7px; }
-.tag { color: #aaa; font-size: 12px; line-height: 1.5; margin-bottom: 28px; }
-.nav { flex: 1; }
-.nav button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: 0;
-  color: #aaa;
-  padding: 12px 13px;
-  border-radius: 10px;
-  margin: 4px 0;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-}
-.nav button.active, .nav button:hover { background: #2c2c2c; color: #fff; }
-.upload-zone {
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid #333;
-}
-.upload-zone label {
-  display: block;
-  font-size: 11px;
-  color: #888;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-}
-.upload-zone input[type="file"] {
-  display: none;
-}
-.upload-btn {
-  display: block;
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  background: #2c2c2c;
-  border: 1px dashed #555;
-  border-radius: 8px;
-  color: #ccc;
-  font-size: 12px;
-  cursor: pointer;
-  text-align: center;
-  transition: background .15s, border-color .15s;
-}
-.upload-btn:hover { background: #383838; border-color: #777; color: #fff; }
-.upload-status { font-size: 11px; color: #6d806d; margin-top: 4px; min-height: 16px; }
-.main {
-  margin-left: 250px;
-  width: calc(100% - 250px);
-  padding: 32px 42px 50px;
-}
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  margin-bottom: 28px;
-}
-.eyebrow {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--muted);
-}
-h1 { font: 46px/1.02 Georgia, serif; margin: 7px 0; }
-.subtitle { color: var(--muted); max-width: 700px; line-height: 1.5; }
-.date {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  padding: 11px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  white-space: nowrap;
-}
-.hero {
-  background: var(--ink);
-  color: #fff;
-  border-radius: 20px;
-  padding: 28px 30px;
-  margin-bottom: 22px;
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 25px;
-}
-.hero h2 { font: 34px Georgia, serif; margin: 8px 0 10px; }
-.hero p { color: #c6c6c6; line-height: 1.6; margin: 0; }
-.quote { font: italic 17px Georgia, serif; margin-top: 22px; color: #ddd; }
-.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.stat {
-  background: #262626;
-  border: 1px solid #393939;
-  border-radius: 14px;
-  padding: 17px;
-}
-.stat b { font-size: 25px; display: block; margin-bottom: 5px; }
-.stat span { color: #aaa; font-size: 12px; }
-.grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 20px; }
-.card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 22px;
-}
-.card h3 { margin: 0 0 17px; font: 22px Georgia, serif; }
-.chartbox { height: 280px; position: relative; }
-.timeline { display: flex; flex-direction: column; gap: 0; }
-.event {
-  display: grid;
-  grid-template-columns: 40px 1fr auto;
-  gap: 12px;
-  align-items: center;
-  padding: 13px 0;
-  border-bottom: 1px dashed var(--line);
-}
-.event:last-child { border-bottom: 0; }
-.icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--soft);
-  font-size: 14px;
-}
-.event .title { font-weight: 650; font-size: 14px; }
-.event .meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
-.amount { font-weight: 700; font-size: 14px; }
-.search {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-.empty { color: var(--muted); padding: 30px 0; text-align: center; }
-.receipt {
-  max-width: 520px;
-  margin: 0 auto;
-  background: #fff;
-  border: 1px solid var(--line);
-  padding: 32px 28px;
-  box-shadow: 0 12px 30px #0000000d;
-  font-family: "Courier New", Courier, monospace;
-}
-.receipt h2 {
-  font: 28px Georgia, serif;
-  text-align: center;
-  margin: 0 0 4px;
-  letter-spacing: 1px;
-}
-.receipt .center { text-align: center; color: var(--muted); font-size: 12px; }
-.receipt hr { border: 0; border-top: 1px dashed #aaa; margin: 18px 0; }
-.row {
-  display: flex;
-  justify-content: space-between;
-  padding: 7px 0;
-  font-size: 13px;
-  gap: 12px;
-}
-.row span:first-child { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.footer {
-  margin-top: 36px;
-  color: #888;
-  font-size: 12px;
-  text-align: center;
-}
-.hidden { display: none !important; }
-.date-picker {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-}
-.date-picker label { font-size: 13px; color: var(--muted); }
-.date-picker input {
-  padding: 8px 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  font-size: 14px;
-  background: var(--paper);
-}
-.btn {
-  background: #171717;
-  color: #fff;
-  border: 0;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-}
-.btn:hover { background: #333; }
-.notice {
-  background: #f0ebe0;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px 18px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-.notice strong { color: var(--ink); }
-@media (max-width: 900px) {
-  .sidebar { width: 200px; }
-  .main { margin-left: 200px; width: calc(100% - 200px); padding: 25px; }
-  .hero, .grid { grid-template-columns: 1fr; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 650px) {
-  .sidebar { position: static; width: 100%; height: auto; }
-  .app { display: block; }
-  .main { margin: 0; width: 100%; padding: 20px; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .top { flex-direction: column; }
-  .date { margin-top: 12px; }
-  .hero h2 { font-size: 26px; }
-  h1 { font-size: 34px; }
-}
+  :root {
+    --paper: #f7f3eb;
+    --paper-2: #efe9dc;
+    --ink: #1a1814;
+    --ink-soft: #3d3a34;
+    --muted: #8a8478;
+    --line: #e2d9c8;
+    --accent: #b54a2f;
+    --accent-soft: #c9785f;
+    --sage: #5c6b5a;
+    --card: #fffcf5;
+    --shadow: 0 1px 2px rgba(26,24,20,.04), 0 8px 24px rgba(26,24,20,.06);
+    --shadow-lg: 0 4px 12px rgba(26,24,20,.06), 0 24px 48px rgba(26,24,20,.08);
+    --radius: 14px;
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* subtle paper grain */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    z-index: 9999;
+  }
+
+  /* ========== LAYOUT ========== */
+  .shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ========== SIDEBAR ========== */
+  .side {
+    background: var(--ink);
+    color: #f0ebe3;
+    padding: 32px 22px 28px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-right: 1px solid #2a2722;
+  }
+
+  .brand {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 26px;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+  }
+  .brand span {
+    display: block;
+    font-family: "DM Sans", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #8a8478;
+    margin-top: 6px;
+  }
+
+  .nav {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+  .nav button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    color: #9c968a;
+    font: 500 13.5px/1 "DM Sans", sans-serif;
+    padding: 11px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: all .2s var(--ease);
+  }
+  .nav button:hover { background: rgba(255,255,255,.06); color: #e8e2d6; }
+  .nav button.active {
+    background: rgba(255,255,255,.1);
+    color: #fff;
+  }
+  .nav button .ico {
+    width: 18px;
+    text-align: center;
+    font-size: 14px;
+    opacity: .85;
+  }
+
+  .upload-block {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #2e2b25;
+  }
+  .upload-label {
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #6e6960;
+    margin-bottom: 10px;
+  }
+  .file-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: transparent;
+    border: 1px dashed #3f3b34;
+    border-radius: 9px;
+    color: #a9a295;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all .2s var(--ease);
+  }
+  .file-btn:hover {
+    border-color: #6e6960;
+    color: #e8e2d6;
+    background: rgba(255,255,255,.04);
+  }
+  input[type=file] { display: none; }
+  .status {
+    font-size: 11px;
+    color: var(--sage);
+    min-height: 16px;
+    margin-bottom: 4px;
+  }
+  .status.err { color: var(--accent-soft); }
+
+  /* ========== MAIN ========== */
+  .main {
+    padding: 36px 48px 60px;
+    max-width: 1180px;
+  }
+
+  .page { display: none; animation: fadeUp .45s var(--ease); }
+  .page.on { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 400;
+    letter-spacing: -.03em;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .lede {
+    margin-top: 10px;
+    color: var(--ink-soft);
+    max-width: 520px;
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+  .date-pill {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+  }
+
+  /* ========== HERO ========== */
+  .hero {
+    background: var(--ink);
+    color: #f5f0e8;
+    border-radius: 20px;
+    padding: 36px 40px;
+    margin-bottom: 28px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    right: -40px;
+    bottom: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(181,74,47,.18), transparent 70%);
+    pointer-events: none;
+  }
+  .hero .eyebrow { color: #8a8478; }
+  .hero h2 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: clamp(28px, 3.2vw, 38px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1.15;
+    margin: 8px 0 14px;
+  }
+  .hero p {
+    color: #b8b1a4;
+    font-size: 15px;
+    max-width: 420px;
+    line-height: 1.6;
+  }
+  .hero .quote {
+    margin-top: 28px;
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-size: 17px;
+    color: #d4cdc0;
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .stat {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 18px 16px;
+    transition: background .2s;
+  }
+  .stat:hover { background: rgba(255,255,255,.08); }
+  .stat b {
+    display: block;
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -.02em;
+    margin-bottom: 4px;
+  }
+  .stat span {
+    font-size: 11.5px;
+    color: #8a8478;
+    letter-spacing: .02em;
+  }
+
+  /* ========== CARDS ========== */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: -.01em;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h3 .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .chart-wrap { height: 260px; position: relative; }
+
+  /* ========== TIMELINE ========== */
+  .search {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    font: 400 14px "DM Sans", sans-serif;
+    color: var(--ink);
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    transition: border-color .2s;
+  }
+  .search:focus {
+    outline: none;
+    border-color: #c4b9a4;
+  }
+  .search::placeholder { color: var(--muted); }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+  }
+  .event {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 4px;
+    border-bottom: 1px solid var(--line);
+    transition: background .15s;
+  }
+  .event:last-child { border-bottom: 0; }
+  .event:hover { background: rgba(0,0,0,.015); }
+  .event .mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    background: var(--paper-2);
+    color: var(--ink-soft);
+  }
+  .event.music .mark { background: #ebe4d6; }
+  .event.money .mark { background: #e8ddd4; color: var(--accent); }
+  .event .title {
+    font-weight: 550;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .event .meta {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .event .amt {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ========== ARTISTS LIST ========== */
+  .artist-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .artist-row:last-child { border-bottom: 0; }
+  .artist-row .rank {
+    color: var(--muted);
+    font-size: 12px;
+    width: 22px;
+    display: inline-block;
+  }
+  .artist-row b {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* ========== RECEIPT ========== */
+  .receipt-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .receipt-controls label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .receipt-controls input[type=date] {
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--card);
+    font: 400 13.5px "DM Sans", sans-serif;
+    color: var(--ink);
+  }
+  .btn {
+    background: var(--ink);
+    color: #f5f0e8;
+    border: 0;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font: 500 13px "DM Sans", sans-serif;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+  }
+  .btn:hover { background: #2e2b25; }
+  .btn:active { transform: scale(.98); }
+
+  .receipt-stage {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0 30px;
+  }
+  .receipt {
+    width: 100%;
+    max-width: 400px;
+    background: #fffef9;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lg);
+    padding: 36px 28px 32px;
+    position: relative;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  /* perforated top edge */
+  .receipt::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background:
+      radial-gradient(circle at 8px 6px, transparent 5px, #fffef9 5.5px) 0 0 / 16px 12px;
+  }
+  .receipt-head {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .receipt-head .store {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 26px;
+    letter-spacing: .04em;
+    margin-bottom: 4px;
+  }
+  .receipt-head .sub {
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .receipt-date {
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  .dash {
+    border: 0;
+    border-top: 1px dashed #c9c0ae;
+    margin: 14px 0;
+  }
+  .r-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 3px 0;
+  }
+  .r-row .left {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .r-section {
+    font-weight: 500;
+    margin: 8px 0 4px;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .r-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+    font-size: 13.5px;
+    margin-top: 6px;
+  }
+  .r-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .r-stamp {
+    margin-top: 18px;
+    text-align: center;
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--accent);
+    opacity: .85;
+  }
+
+  /* ========== NOTICE ========== */
+  .notice {
+    background: linear-gradient(135deg, #f5efe3, #efe6d6);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .notice strong { color: var(--ink); }
+  .notice .ico { font-size: 16px; margin-top: 1px; }
+
+  /* ========== FOOTER ========== */
+  .site-foot {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 960px) {
+    .shell { grid-template-columns: 200px 1fr; }
+    .main { padding: 28px 28px 48px; }
+    .hero, .grid-2 { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 680px) {
+    .shell { grid-template-columns: 1fr; }
+    .side {
+      position: relative;
+      height: auto;
+      padding: 22px 18px;
+    }
+    .nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      gap: 6px;
+    }
+    .nav button { width: auto; padding: 9px 12px; font-size: 12.5px; }
+    .upload-block { display: none; }
+    .main { padding: 24px 18px 40px; }
+    .page-head { flex-direction: column; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    h1 { font-size: 34px; }
+  }
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="brand">Life Receipts</div>
-    <div class="tag">A quiet archive of the little things that became your life.</div>
-    <div class="nav">
-      <button class="active" data-page="home" onclick="showPage('home', this)">⌂ Overview</button>
-      <button data-page="timeline" onclick="showPage('timeline', this)">◷ Timeline</button>
-      <button data-page="music" onclick="showPage('music', this)">♫ Music</button>
-      <button data-page="spending" onclick="showPage('spending', this)">₹ Spending</button>
-      <button data-page="receipt" onclick="showPage('receipt', this)">▤ Daily Receipt</button>
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="side">
+    <div class="brand">
+      Life Receipts
+      <span>Archival instrument</span>
     </div>
-    <div class="upload-zone">
-      <label>Load your data</label>
-      <label class="upload-btn" for="spotifyFile">Upload Spotify CSV</label>
-      <input type="file" id="spotifyFile" accept=".csv,text/csv" onchange="handleFile(this, 'spotify')">
-      <div class="upload-status" id="spotifyStatus">Using demo data</div>
-      <label class="upload-btn" for="txFile" style="margin-top:10px">Upload Transactions CSV</label>
-      <input type="file" id="txFile" accept=".csv,text/csv" onchange="handleFile(this, 'transactions')">
-      <div class="upload-status" id="txStatus">Using demo data</div>
+
+    <nav class="nav">
+      <button class="active" data-page="home" onclick="go('home', this)">
+        <span class="ico">◈</span> Overview
+      </button>
+      <button data-page="timeline" onclick="go('timeline', this)">
+        <span class="ico">◷</span> Timeline
+      </button>
+      <button data-page="music" onclick="go('music', this)">
+        <span class="ico">♫</span> Music
+      </button>
+      <button data-page="spend" onclick="go('spend', this)">
+        <span class="ico">₹</span> Spending
+      </button>
+      <button data-page="receipt" onclick="go('receipt', this)">
+        <span class="ico">▤</span> Daily Receipt
+      </button>
+    </nav>
+
+    <div class="upload-block">
+      <div class="upload-label">Load your data</div>
+      <label class="file-btn" for="spFile">Spotify history CSV</label>
+      <input type="file" id="spFile" accept=".csv,text/csv" onchange="loadFile(this,'spotify')">
+      <div class="status" id="spStatus">Demo data active</div>
+
+      <label class="file-btn" for="txFile">Transactions CSV</label>
+      <input type="file" id="txFile" accept=".csv,text/csv" onchange="loadFile(this,'tx')">
+      <div class="status" id="txStatus">Demo data active</div>
     </div>
   </aside>
 
+  <!-- MAIN -->
   <main class="main">
     <!-- HOME -->
-    <section id="home">
-      <div class="top">
+    <section class="page on" id="home">
+      <div class="page-head">
         <div>
-          <div class="eyebrow">Your digital life</div>
-          <h1>In Receipts.</h1>
-          <div class="subtitle">Turn ordinary data into a story of where your attention, time and money went.</div>
+          <div class="eyebrow">Personal archive</div>
+          <h1>In receipts.</h1>
+          <p class="lede">Ordinary data, reconstructed. Music you played. Money you spent. Days that never asked to be remembered.</p>
         </div>
-        <div class="date" id="today"></div>
+        <div class="date-pill" id="today"></div>
       </div>
-      <div class="notice" id="demoNotice">
-        <strong>Demo mode.</strong> Upload your Spotify listening history export and a household transactions CSV on the left to see your own life in receipts. Data never leaves your browser.
+
+      <div class="notice" id="demoNote">
+        <span class="ico">✦</span>
+        <div><strong>Demo mode.</strong> Upload your Spotify export and a transactions CSV on the left. Everything stays in your browser — nothing is sent anywhere.</div>
       </div>
+
       <div class="hero">
         <div>
           <div class="eyebrow">A moment worth keeping</div>
-          <h2 id="heroTitle">Your life is made of tiny moments.</h2>
-          <p id="heroText">Music you played. Things you bought. Days that passed without asking to be remembered.</p>
-          <div class="quote">“Individually, they are data. Together, they are a memory.”</div>
+          <h2>Your life is made<br>of tiny moments.</h2>
+          <p>Individually they are rows in a spreadsheet. Together they form the quiet texture of a life.</p>
+          <div class="quote">“Individually, they are data.<br>Together, they are a memory.”</div>
         </div>
-        <div class="stats">
-          <div class="stat"><b id="listenStat">—</b><span>listening records</span></div>
-          <div class="stat"><b id="spendStat">—</b><span>transactions</span></div>
-          <div class="stat"><b id="artistStat">—</b><span>unique artists</span></div>
-          <div class="stat"><b id="categoryStat">—</b><span>spending categories</span></div>
+        <div class="stat-grid">
+          <div class="stat"><b id="sListen">—</b><span>listening records</span></div>
+          <div class="stat"><b id="sTx">—</b><span>transactions</span></div>
+          <div class="stat"><b id="sArtists">—</b><span>unique artists</span></div>
+          <div class="stat"><b id="sCats">—</b><span>categories</span></div>
         </div>
       </div>
-      <div class="grid">
+
+      <div class="grid-2">
         <div class="card">
-          <h3>How your time sounded</h3>
-          <div class="chartbox"><canvas id="musicChart"></canvas></div>
+          <h3><span class="dot"></span> How your time sounded</h3>
+          <div class="chart-wrap"><canvas id="cMusic"></canvas></div>
         </div>
         <div class="card">
-          <h3>Where money went</h3>
-          <div class="chartbox"><canvas id="spendChart"></canvas></div>
+          <h3><span class="dot"></span> Where money went</h3>
+          <div class="chart-wrap"><canvas id="cSpend"></canvas></div>
         </div>
       </div>
     </section>
 
     <!-- TIMELINE -->
-    <section id="timeline" class="hidden">
-      <div class="top">
+    <section class="page" id="timeline">
+      <div class="page-head">
         <div>
           <div class="eyebrow">Chronological memory</div>
           <h1>Timeline</h1>
-          <div class="subtitle">A combined stream from your listening history and transactions.</div>
+          <p class="lede">A single stream of listening and spending — searchable, ordered by time.</p>
         </div>
       </div>
-      <input id="timelineSearch" class="search" placeholder="Search a song, artist, category or transaction..." oninput="renderTimeline()">
-      <div class="card"><div id="timelineList" class="timeline"></div></div>
+      <input class="search" id="q" placeholder="Search song, artist, category, note…" oninput="drawTimeline()">
+      <div class="card">
+        <div class="timeline" id="tl"></div>
+      </div>
     </section>
 
     <!-- MUSIC -->
-    <section id="music" class="hidden">
-      <div class="top">
+    <section class="page" id="music">
+      <div class="page-head">
         <div>
           <div class="eyebrow">Attention archive</div>
           <h1>Music</h1>
-          <div class="subtitle">The songs and artists that occupied your time.</div>
+          <p class="lede">The artists and tracks that occupied your hours.</p>
         </div>
       </div>
-      <div class="grid">
+      <div class="grid-2">
         <div class="card">
-          <h3>Listening activity</h3>
-          <div class="chartbox"><canvas id="musicTimeChart"></canvas></div>
+          <h3><span class="dot"></span> Top artists by plays</h3>
+          <div class="chart-wrap"><canvas id="cMusic2"></canvas></div>
         </div>
         <div class="card">
-          <h3>Top artists</h3>
-          <div id="artists"></div>
+          <h3><span class="dot"></span> Ranked list</h3>
+          <div id="artistList"></div>
         </div>
       </div>
     </section>
 
     <!-- SPENDING -->
-    <section id="spending" class="hidden">
-      <div class="top">
+    <section class="page" id="spend">
+      <div class="page-head">
         <div>
           <div class="eyebrow">Material archive</div>
           <h1>Spending</h1>
-          <div class="subtitle">The things you chose to spend money on.</div>
+          <p class="lede">The categories that claimed your money.</p>
         </div>
       </div>
       <div class="card">
-        <h3>Categories</h3>
-        <div class="chartbox"><canvas id="spendingCategoryChart"></canvas></div>
+        <h3><span class="dot"></span> Categories</h3>
+        <div class="chart-wrap" style="height:320px"><canvas id="cCats"></canvas></div>
       </div>
     </section>
 
     <!-- RECEIPT -->
-    <section id="receipt" class="hidden">
-      <div class="top">
+    <section class="page" id="receipt">
+      <div class="page-head">
         <div>
           <div class="eyebrow">One day, reconstructed</div>
           <h1>Daily Receipt</h1>
-          <div class="subtitle">A printable snapshot of one day from your data.</div>
+          <p class="lede">A tangible snapshot of a single day from your data.</p>
         </div>
       </div>
-      <div class="date-picker">
-        <label for="receiptDate">Pick a date:</label>
-        <input type="date" id="receiptDate" onchange="renderReceipt()">
-        <button class="btn" onclick="renderReceipt()">Refresh</button>
+      <div class="receipt-controls">
+        <label for="rDate">Date</label>
+        <input type="date" id="rDate" onchange="drawReceipt()">
+        <button class="btn" onclick="drawReceipt()">Refresh</button>
       </div>
-      <div class="receipt" id="receiptBox"></div>
+      <div class="receipt-stage">
+        <div class="receipt" id="receiptBox"></div>
+      </div>
     </section>
 
-    <div class="footer">Life Receipts · Built from your Spotify history + household transaction data · All processing happens in your browser</div>
+    <div class="site-foot">Life Receipts · All processing happens in your browser · Nothing leaves this device</div>
   </main>
 </div>
 
 <script>
 /* ========== DEMO DATA ========== */
-const spotifySample = [
-  {"spotify_track_uri":"2J3n32GeLmMjwuAzyhcSNe","ts":"2013-07-08 02:44:34","platform":"web player","ms_played":3185,"track_name":"Say It, Just Say It","artist_name":"The Mowgli's","album_name":"Waiting For The Dawn","reason_start":"autoplay","reason_end":"clickrow","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"1oHxIPqJyvAYHy0PVrDU98","ts":"2013-07-08 02:45:37","platform":"web player","ms_played":61865,"track_name":"Drinking from the Bottle (feat. Tinie Tempah)","artist_name":"Calvin Harris","album_name":"18 Months","reason_start":"clickrow","reason_end":"clickrow","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"487OPlneJNni3NWC8SYqhW","ts":"2013-07-08 02:50:24","platform":"web player","ms_played":285386,"track_name":"Born To Die","artist_name":"Lana Del Rey","album_name":"Born To Die - The Paradise Edition","reason_start":"clickrow","reason_end":"unknown","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"5IyblF777jLZj1vGHG2UD3","ts":"2013-07-08 02:52:40","platform":"web player","ms_played":134022,"track_name":"Off To The Races","artist_name":"Lana Del Rey","album_name":"Born To Die - The Paradise Edition","reason_start":"trackdone","reason_end":"clickrow","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"0GgAAB0ZMllFhbNc3mAodO","ts":"2013-07-08 03:17:52","platform":"web player","ms_played":0,"track_name":"Half Mast","artist_name":"Empire Of The Sun","album_name":"Walking On A Dream","reason_start":"clickrow","reason_end":"nextbtn","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"50VNvhzyaSplJCKWchN7a8","ts":"2013-07-08 03:17:52","platform":"web player","ms_played":63485,"track_name":"Impossible","artist_name":"James Arthur","album_name":"Impossible","reason_start":"clickrow","reason_end":"clickrow","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"1I4EczxGBcPR3J3KeyqFJP","ts":"2013-07-08 03:17:56","platform":"web player","ms_played":0,"track_name":"We Own The Sky","artist_name":"M83","album_name":"Saturdays = Youth","reason_start":"nextbtn","reason_end":"nextbtn","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"5arVt2Wg0zbiWwAOZef2Nl","ts":"2013-07-08 03:17:56","platform":"web player","ms_played":1268,"track_name":"Higher Ground - Remastered 2003","artist_name":"Red Hot Chili Peppers","album_name":"Mother's Milk","reason_start":"nextbtn","reason_end":"nextbtn","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"4iV5W9uYEdYUVa79Axb7Rh","ts":"2014-02-14 18:22:11","platform":"iOS","ms_played":210000,"track_name":"Video Games","artist_name":"Lana Del Rey","album_name":"Born To Die","reason_start":"clickrow","reason_end":"trackdone","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"0VjIjW4GlUZAMYd2vXMi3b","ts":"2015-06-20 09:15:00","platform":"Android","ms_played":245000,"track_name":"Blinding Lights","artist_name":"The Weeknd","album_name":"After Hours","reason_start":"autoplay","reason_end":"trackdone","shuffle":true,"skipped":false},
-  {"spotify_track_uri":"7qiZfU4dY1lWllzX7mPBI3","ts":"2016-03-11 21:40:33","platform":"web player","ms_played":233000,"track_name":"Shape of You","artist_name":"Ed Sheeran","album_name":"÷","reason_start":"clickrow","reason_end":"trackdone","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"3n3Ppam7vgaVa1iaRUc9Lp","ts":"2017-11-05 14:08:19","platform":"iOS","ms_played":198000,"track_name":"Mr. Brightside","artist_name":"The Killers","album_name":"Hot Fuss","reason_start":"clickrow","reason_end":"trackdone","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"0pqnGHJpmpxLKifKRmU6WP","ts":"2018-09-20 12:10:00","platform":"Android","ms_played":220000,"track_name":"Believer","artist_name":"Imagine Dragons","album_name":"Evolve","reason_start":"autoplay","reason_end":"trackdone","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"2Fxmhks0bxGSBdJ92vM42m","ts":"2018-09-20 12:15:30","platform":"Android","ms_played":180000,"track_name":"bad guy","artist_name":"Billie Eilish","album_name":"WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?","reason_start":"clickrow","reason_end":"trackdone","shuffle":false,"skipped":false},
-  {"spotify_track_uri":"0e7ipj03S05BNilyu5bRzt","ts":"2019-01-01 00:05:12","platform":"web player","ms_played":250000,"track_name":"rockstar (feat. 21 Savage)","artist_name":"Post Malone","album_name":"beerbongs & bentleys","reason_start":"autoplay","reason_end":"trackdone","shuffle":true,"skipped":false}
+const SP_SAMPLE = [
+  {ts:"2013-07-08 02:44:34",track_name:"Say It, Just Say It",artist_name:"The Mowgli's",ms_played:3185},
+  {ts:"2013-07-08 02:45:37",track_name:"Drinking from the Bottle",artist_name:"Calvin Harris",ms_played:61865},
+  {ts:"2013-07-08 02:50:24",track_name:"Born To Die",artist_name:"Lana Del Rey",ms_played:285386},
+  {ts:"2013-07-08 02:52:40",track_name:"Off To The Races",artist_name:"Lana Del Rey",ms_played:134022},
+  {ts:"2013-07-08 03:17:52",track_name:"Impossible",artist_name:"James Arthur",ms_played:63485},
+  {ts:"2014-02-14 18:22:11",track_name:"Video Games",artist_name:"Lana Del Rey",ms_played:210000},
+  {ts:"2015-06-20 09:15:00",track_name:"Blinding Lights",artist_name:"The Weeknd",ms_played:245000},
+  {ts:"2016-03-11 21:40:33",track_name:"Shape of You",artist_name:"Ed Sheeran",ms_played:233000},
+  {ts:"2017-11-05 14:08:19",track_name:"Mr. Brightside",artist_name:"The Killers",ms_played:198000},
+  {ts:"2018-09-20 12:10:00",track_name:"Believer",artist_name:"Imagine Dragons",ms_played:220000},
+  {ts:"2018-09-20 12:15:30",track_name:"bad guy",artist_name:"Billie Eilish",ms_played:180000},
+  {ts:"2019-01-01 00:05:12",track_name:"rockstar",artist_name:"Post Malone",ms_played:250000},
+  {ts:"2019-05-12 16:22:00",track_name:"Summertime Sadness",artist_name:"Lana Del Rey",ms_played:265000},
+  {ts:"2020-03-18 09:40:11",track_name:"Circles",artist_name:"Post Malone",ms_played:215000},
+  {ts:"2021-08-02 22:11:44",track_name:"drivers license",artist_name:"Olivia Rodrigo",ms_played:242000}
 ];
 
-const transactionSample = [
-  {"Date":"20/09/2018 12:04:08","Mode":"Cash","Category":"Transportation","Subcategory":"Train","Note":"2 Place 5 to Place 0","Amount":30.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"20/09/2018 12:03:15","Mode":"Cash","Category":"Food","Subcategory":"snacks","Note":"Idli medu Vada mix 2 plates","Amount":60.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"19/09/2018","Mode":"Saving Bank account 1","Category":"subscription","Subcategory":"Netflix","Note":"1 month subscription","Amount":199.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"17/09/2018 23:41:17","Mode":"Saving Bank account 1","Category":"subscription","Subcategory":"Mobile Service Provider","Note":"Data booster pack","Amount":19.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"16/09/2018 17:15:08","Mode":"Cash","Category":"Festivals","Subcategory":"Ganesh Pujan","Note":"Ganesh idol","Amount":251.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"15/09/2018 06:34:17","Mode":"Credit Card","Category":"subscription","Subcategory":"Tata Sky","Note":"Permanent Residence - Tata Play recharge","Amount":200.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"14/09/2018 05:39:17","Mode":"Cash","Category":"Transportation","Subcategory":"auto","Note":"Place 2 station to Permanent Residence","Amount":50.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"13/09/2018 21:35:15","Mode":"Saving Bank account 1","Category":"Transportation","Subcategory":"Train","Note":"2 Place 0 to Place 3","Amount":40.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"12/09/2018 19:20:00","Mode":"Cash","Category":"Food","Subcategory":"dinner","Note":"Thali at local restaurant","Amount":120.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"10/09/2018 08:00:00","Mode":"UPI","Category":"Food","Subcategory":"breakfast","Note":"Coffee + bun","Amount":45.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"05/09/2018","Mode":"Credit Card","Category":"Shopping","Subcategory":"clothes","Note":"T-shirt","Amount":799.0,"Income/Expense":"Expense","Currency":"INR"},
-  {"Date":"01/09/2018","Mode":"Saving Bank account 1","Category":"subscription","Subcategory":"Spotify","Note":"Premium monthly","Amount":119.0,"Income/Expense":"Expense","Currency":"INR"}
+const TX_SAMPLE = [
+  {Date:"20/09/2018 12:04:08",Category:"Transportation",Note:"Train · Place 5 → Place 0",Amount:30},
+  {Date:"20/09/2018 12:03:15",Category:"Food",Note:"Idli medu Vada · 2 plates",Amount:60},
+  {Date:"19/09/2018",Category:"Subscription",Note:"Netflix · 1 month",Amount:199},
+  {Date:"17/09/2018 23:41:17",Category:"Subscription",Note:"Data booster pack",Amount:19},
+  {Date:"16/09/2018 17:15:08",Category:"Festivals",Note:"Ganesh idol",Amount:251},
+  {Date:"15/09/2018 06:34:17",Category:"Subscription",Note:"Tata Play recharge",Amount:200},
+  {Date:"14/09/2018 05:39:17",Category:"Transportation",Note:"Auto · station → home",Amount:50},
+  {Date:"13/09/2018 21:35:15",Category:"Transportation",Note:"Train · Place 0 → Place 3",Amount:40},
+  {Date:"12/09/2018 19:20:00",Category:"Food",Note:"Thali · local restaurant",Amount:120},
+  {Date:"10/09/2018 08:00:00",Category:"Food",Note:"Coffee + bun",Amount:45},
+  {Date:"05/09/2018",Category:"Shopping",Note:"T-shirt",Amount:799},
+  {Date:"01/09/2018",Category:"Subscription",Note:"Spotify Premium",Amount:119}
 ];
 
-/* ========== STATE ========== */
 const state = {
-  spotify: [...spotifySample],
-  transactions: [...transactionSample],
+  spotify: [...SP_SAMPLE],
+  tx: [...TX_SAMPLE],
   charts: {}
 };
 
 /* ========== HELPERS ========== */
-function pick(obj, names) {
-  for (const n of names) {
-    if (obj[n] !== undefined && obj[n] !== null && obj[n] !== "") return obj[n];
-  }
+const pick = (o, keys) => {
+  for (const k of keys) if (o[k] != null && o[k] !== "") return o[k];
   return "";
-}
-
-function esc(s) {
-  return String(s ?? "").replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[m]));
-}
-
-function moneyValue(x) {
-  const s = String(x ?? "").replace(/[₹,$€£]/g, "");
-  const n = parseFloat(s.replace(/[^0-9.-]/g, ""));
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;'}[m]));
+const money = x => {
+  const n = parseFloat(String(x ?? "").replace(/[^0-9.-]/g, ""));
   return isNaN(n) ? 0 : n;
-}
-
-function groupCount(arr, keyFn) {
+};
+const group = (arr, fn) => {
   const o = {};
-  arr.forEach(x => {
-    const k = keyFn(x) || "Unknown";
-    o[k] = (o[k] || 0) + 1;
-  });
-  return Object.entries(o).sort((a, b) => b[1] - a[1]);
-}
+  arr.forEach(x => { const k = fn(x) || "Unknown"; o[k] = (o[k]||0)+1; });
+  return Object.entries(o).sort((a,b) => b[1]-a[1]);
+};
 
 function parseCSV(text) {
-  const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter(l => l.trim());
+  const lines = text.replace(/\r\n?/g, "\n").split("\n").filter(l => l.trim());
   if (lines.length < 2) return [];
-  // Simple CSV parser that handles quoted fields
-  function splitLine(line) {
-    const result = [];
-    let cur = "";
-    let inQuotes = false;
+  const split = line => {
+    const out = []; let cur = "", q = false;
     for (let i = 0; i < line.length; i++) {
       const c = line[i];
-      if (c === '"') {
-        if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
-        else inQuotes = !inQuotes;
-      } else if (c === ',' && !inQuotes) {
-        result.push(cur.trim());
-        cur = "";
-      } else {
-        cur += c;
-      }
+      if (c === '"') { if (q && line[i+1] === '"') { cur += '"'; i++; } else q = !q; }
+      else if (c === ',' && !q) { out.push(cur.trim()); cur = ""; }
+      else cur += c;
     }
-    result.push(cur.trim());
-    return result;
-  }
-  const headers = splitLine(lines[0]).map(h => h.replace(/^"|"$/g, "").trim());
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const vals = splitLine(lines[i]);
-    if (vals.every(v => !v)) continue;
+    out.push(cur.trim());
+    return out;
+  };
+  const headers = split(lines[0]).map(h => h.replace(/^"|"$/g, ""));
+  return lines.slice(1).map(line => {
+    const vals = split(line);
     const obj = {};
-    headers.forEach((h, idx) => { obj[h] = (vals[idx] || "").replace(/^"|"$/g, ""); });
-    rows.push(obj);
-  }
-  return rows;
+    headers.forEach((h,i) => obj[h] = (vals[i]||"").replace(/^"|"$/g, ""));
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
 }
 
-function normalizeSpotify(rows) {
+function normSpotify(rows) {
   return rows.map(r => ({
     ...r,
-    track_name: pick(r, ["master_metadata_track_name", "track_name", "track", "Track", "song", "Song"]),
-    artist_name: pick(r, ["master_metadata_album_artist_name", "artist_name", "artist", "Artist"]),
-    album_name: pick(r, ["master_metadata_album_album_name", "album_name", "album", "Album"]),
-    ts: pick(r, ["ts", "timestamp", "endTime", "date", "Date"]),
-    ms_played: parseInt(pick(r, ["ms_played", "msPlayed", "duration_ms"]) || "0", 10)
+    track_name: pick(r, ["master_metadata_track_name","track_name","track","Track","song"]),
+    artist_name: pick(r, ["master_metadata_album_artist_name","artist_name","artist","Artist"]),
+    ts: pick(r, ["ts","timestamp","endTime","date","Date"]),
+    ms_played: parseInt(pick(r, ["ms_played","msPlayed","duration_ms"]) || "0", 10)
   })).filter(r => r.track_name || r.artist_name);
 }
 
-function normalizeTransactions(rows) {
+function normTx(rows) {
   return rows.map(r => ({
     ...r,
-    Date: pick(r, ["Date", "date", "timestamp", "Timestamp", "transaction_date"]),
-    Category: pick(r, ["Category", "category", "type", "Type", "expense_category"]),
-    Subcategory: pick(r, ["Subcategory", "subcategory", "sub_category"]),
-    Note: pick(r, ["Note", "note", "description", "Description", "memo"]),
-    Amount: moneyValue(pick(r, ["Amount", "amount", "price", "Price", "value", "Value"])),
-    "Income/Expense": pick(r, ["Income/Expense", "type", "Type", "income_expense"])
+    Date: pick(r, ["Date","date","timestamp","Timestamp"]),
+    Category: pick(r, ["Category","category","type","Type"]),
+    Note: pick(r, ["Note","note","description","Description","memo"]),
+    Amount: money(pick(r, ["Amount","amount","price","Price","value"]))
   })).filter(r => r.Date || r.Category || r.Amount);
 }
 
-function parseFlexibleDate(str) {
+function parseDate(str) {
   if (!str) return null;
-  // Try ISO first
   let d = new Date(str);
-  if (!isNaN(d.getTime())) return d;
-  // DD/MM/YYYY or DD-MM-YYYY
+  if (!isNaN(d)) return d;
   const m = String(str).match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
   if (m) {
-    const day = parseInt(m[1], 10);
-    const month = parseInt(m[2], 10) - 1;
-    let year = parseInt(m[3], 10);
-    if (year < 100) year += 2000;
-    const hour = m[4] ? parseInt(m[4], 10) : 0;
-    const min = m[5] ? parseInt(m[5], 10) : 0;
-    const sec = m[6] ? parseInt(m[6], 10) : 0;
-    d = new Date(year, month, day, hour, min, sec);
-    if (!isNaN(d.getTime())) return d;
+    let y = +m[3]; if (y < 100) y += 2000;
+    d = new Date(y, +m[2]-1, +m[1], +(m[4]||0), +(m[5]||0), +(m[6]||0));
+    if (!isNaN(d)) return d;
   }
   return null;
 }
+const dateKey = d => d && !isNaN(d) ? d.toISOString().slice(0,10) : "";
 
-function toDateKey(d) {
-  if (!d || isNaN(d.getTime())) return "";
-  return d.toISOString().slice(0, 10);
-}
-
-/* ========== FILE HANDLING ========== */
-function handleFile(input, kind) {
-  const file = input.files[0];
-  if (!file) return;
-  const statusEl = document.getElementById(kind === "spotify" ? "spotifyStatus" : "txStatus");
-  statusEl.textContent = "Loading…";
-  statusEl.style.color = "#aaa";
-
+/* ========== FILE LOAD ========== */
+function loadFile(input, kind) {
+  const f = input.files[0];
+  if (!f) return;
+  const el = document.getElementById(kind === "spotify" ? "spStatus" : "txStatus");
+  el.textContent = "Loading…";
+  el.classList.remove("err");
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = e => {
     try {
       const rows = parseCSV(e.target.result);
       if (kind === "spotify") {
-        state.spotify = normalizeSpotify(rows);
-        statusEl.textContent = `${state.spotify.length.toLocaleString()} tracks loaded`;
+        state.spotify = normSpotify(rows);
+        el.textContent = `${state.spotify.length.toLocaleString()} tracks`;
       } else {
-        state.transactions = normalizeTransactions(rows);
-        statusEl.textContent = `${state.transactions.length.toLocaleString()} transactions loaded`;
+        state.tx = normTx(rows);
+        el.textContent = `${state.tx.length.toLocaleString()} transactions`;
       }
-      statusEl.style.color = "#6d806d";
-      document.getElementById("demoNotice").classList.add("hidden");
-      refreshAll();
+      document.getElementById("demoNote")?.classList.add("hidden");
+      document.getElementById("demoNote").style.display = "none";
+      refresh();
     } catch (err) {
       console.error(err);
-      statusEl.textContent = "Failed to parse CSV";
-      statusEl.style.color = "#9b625a";
+      el.textContent = "Parse failed";
+      el.classList.add("err");
     }
   };
-  reader.onerror = () => {
-    statusEl.textContent = "Could not read file";
-    statusEl.style.color = "#9b625a";
-  };
-  reader.readAsText(file);
+  reader.onerror = () => { el.textContent = "Read failed"; el.classList.add("err"); };
+  reader.readAsText(f);
 }
 
 /* ========== NAV ========== */
-function showPage(id, btn) {
-  document.querySelectorAll("main section").forEach(x => x.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-  document.querySelectorAll(".nav button").forEach(x => x.classList.remove("active"));
+function go(id, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("on"));
+  document.getElementById(id).classList.add("on");
+  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
-  // Re-render charts that may have been hidden (Chart.js needs visible canvas)
-  if (id === "home" || id === "music" || id === "spending") {
-    setTimeout(() => renderCharts(), 50);
-  }
-  if (id === "timeline") renderTimeline();
-  if (id === "receipt") renderReceipt();
+  if (["home","music","spend"].includes(id)) setTimeout(drawCharts, 40);
+  if (id === "timeline") drawTimeline();
+  if (id === "receipt") drawReceipt();
 }
 
 /* ========== CHARTS ========== */
-function destroyChart(key) {
-  if (state.charts[key]) {
-    state.charts[key].destroy();
-    delete state.charts[key];
-  }
+function kill(key) {
+  if (state.charts[key]) { state.charts[key].destroy(); delete state.charts[key]; }
 }
 
-function renderCharts() {
-  const artists = groupCount(state.spotify, x => pick(x, ["artist_name", "master_metadata_album_artist_name", "artist", "Artist"]));
-  const cats = groupCount(state.transactions, x => pick(x, ["Category", "category", "type", "Type"]));
+function drawCharts() {
+  const artists = group(state.spotify, x => pick(x, ["artist_name","artist"]));
+  const cats = group(state.tx, x => pick(x, ["Category","category"]));
 
-  document.getElementById("listenStat").textContent = state.spotify.length.toLocaleString();
-  document.getElementById("spendStat").textContent = state.transactions.length.toLocaleString();
-  document.getElementById("artistStat").textContent = artists.length.toLocaleString();
-  document.getElementById("categoryStat").textContent = cats.length.toLocaleString();
+  document.getElementById("sListen").textContent = state.spotify.length.toLocaleString();
+  document.getElementById("sTx").textContent = state.tx.length.toLocaleString();
+  document.getElementById("sArtists").textContent = artists.length.toLocaleString();
+  document.getElementById("sCats").textContent = cats.length.toLocaleString();
 
-  const chartOpts = {
+  const base = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } }
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: "#8a8478" } },
+      y: { grid: { color: "rgba(0,0,0,.05)" }, ticks: { font: { size: 11 }, color: "#8a8478" }, beginAtZero: true }
+    }
   };
 
-  // Music bar (home)
-  destroyChart("music");
-  const musicCtx = document.getElementById("musicChart");
-  if (musicCtx) {
-    state.charts.music = new Chart(musicCtx, {
+  // Home music
+  kill("m1");
+  const c1 = document.getElementById("cMusic");
+  if (c1) {
+    state.charts.m1 = new Chart(c1, {
       type: "bar",
       data: {
-        labels: artists.slice(0, 7).map(x => x[0].length > 18 ? x[0].slice(0, 16) + "…" : x[0]),
-        datasets: [{
-          data: artists.slice(0, 7).map(x => x[1]),
-          backgroundColor: "#171717",
-          borderRadius: 6
-        }]
+        labels: artists.slice(0,7).map(a => a[0].length > 14 ? a[0].slice(0,12)+"…" : a[0]),
+        datasets: [{ data: artists.slice(0,7).map(a => a[1]), backgroundColor: "#1a1814", borderRadius: 5, barPercentage: .65 }]
       },
-      options: chartOpts
+      options: base
     });
   }
 
-  // Spend doughnut (home)
-  destroyChart("spend");
-  const spendCtx = document.getElementById("spendChart");
-  if (spendCtx) {
-    state.charts.spend = new Chart(spendCtx, {
+  // Home spend
+  kill("s1");
+  const c2 = document.getElementById("cSpend");
+  if (c2) {
+    state.charts.s1 = new Chart(c2, {
       type: "doughnut",
       data: {
-        labels: cats.slice(0, 8).map(x => x[0]),
+        labels: cats.slice(0,7).map(c => c[0]),
         datasets: [{
-          data: cats.slice(0, 8).map(x => x[1]),
-          backgroundColor: ["#171717", "#3a3a3a", "#5c5c5c", "#7a7a7a", "#9b625a", "#6d806d", "#8a7a5c", "#555"]
+          data: cats.slice(0,7).map(c => c[1]),
+          backgroundColor: ["#1a1814","#3d3a34","#5c564c","#8a8478","#b54a2f","#5c6b5a","#c4b9a4"],
+          borderWidth: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } }
+        cutout: "62%",
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 10, padding: 12, font: { size: 11 }, color: "#3d3a34" } } }
       }
     });
   }
 
-  // Music time chart (music page)
-  destroyChart("musicTime");
-  const musicTimeCtx = document.getElementById("musicTimeChart");
-  if (musicTimeCtx) {
-    state.charts.musicTime = new Chart(musicTimeCtx, {
+  // Music page
+  kill("m2");
+  const c3 = document.getElementById("cMusic2");
+  if (c3) {
+    state.charts.m2 = new Chart(c3, {
       type: "bar",
       data: {
-        labels: artists.slice(0, 10).map(x => x[0].length > 16 ? x[0].slice(0, 14) + "…" : x[0]),
-        datasets: [{
-          label: "Plays",
-          data: artists.slice(0, 10).map(x => x[1]),
-          backgroundColor: "#171717",
-          borderRadius: 6
-        }]
+        labels: artists.slice(0,10).map(a => a[0].length > 12 ? a[0].slice(0,10)+"…" : a[0]),
+        datasets: [{ data: artists.slice(0,10).map(a => a[1]), backgroundColor: "#1a1814", borderRadius: 5, barPercentage: .6 }]
       },
-      options: chartOpts
+      options: base
     });
   }
 
-  // Spending category chart
-  destroyChart("spendCat");
-  const spendCatCtx = document.getElementById("spendingCategoryChart");
-  if (spendCatCtx) {
-    state.charts.spendCat = new Chart(spendCatCtx, {
+  // Spending page
+  kill("c1");
+  const c4 = document.getElementById("cCats");
+  if (c4) {
+    state.charts.c1 = new Chart(c4, {
       type: "bar",
       data: {
-        labels: cats.slice(0, 12).map(x => x[0]),
-        datasets: [{
-          label: "Transactions",
-          data: cats.slice(0, 12).map(x => x[1]),
-          backgroundColor: "#171717",
-          borderRadius: 6
-        }]
+        labels: cats.slice(0,12).map(c => c[0]),
+        datasets: [{ data: cats.slice(0,12).map(c => c[1]), backgroundColor: "#1a1814", borderRadius: 5, barPercentage: .55 }]
       },
-      options: chartOpts
+      options: { ...base, indexAxis: "y", scales: { ...base.scales, x: { ...base.scales.x, beginAtZero: true } } }
     });
   }
 
-  // Top artists list
-  const artistsEl = document.getElementById("artists");
-  if (artistsEl) {
-    artistsEl.innerHTML = artists.length
-      ? artists.slice(0, 12).map((a, i) =>
-          `<div class="row"><span>${i + 1}. ${esc(a[0])}</span><b>${a[1]}</b></div>`
+  // Artist list
+  const list = document.getElementById("artistList");
+  if (list) {
+    list.innerHTML = artists.length
+      ? artists.slice(0,12).map((a,i) =>
+          `<div class="artist-row"><span><span class="rank">${String(i+1).padStart(2,"0")}</span> ${esc(a[0])}</span><b>${a[1]}</b></div>`
         ).join("")
-      : '<div class="empty">No artists yet.</div>';
+      : '<div class="empty">No artists yet</div>';
   }
 }
 
 /* ========== TIMELINE ========== */
-function renderTimeline() {
-  const q = (document.getElementById("timelineSearch")?.value || "").toLowerCase();
+function drawTimeline() {
+  const q = (document.getElementById("q")?.value || "").toLowerCase();
   const events = [];
 
   state.spotify.forEach(x => {
-    const dateStr = pick(x, ["ts", "timestamp", "date", "Date", "endTime"]);
+    const ds = pick(x, ["ts","timestamp","date"]);
     events.push({
       kind: "music",
-      date: dateStr,
-      sortDate: parseFlexibleDate(dateStr),
-      title: pick(x, ["track_name", "master_metadata_track_name", "track", "song"]) || "Music played",
-      meta: pick(x, ["artist_name", "master_metadata_album_artist_name", "artist"])
+      date: ds,
+      sort: parseDate(ds),
+      title: pick(x, ["track_name","track"]) || "Track",
+      meta: pick(x, ["artist_name","artist"])
     });
   });
-
-  state.transactions.forEach(x => {
-    const dateStr = pick(x, ["Date", "date", "timestamp"]);
+  state.tx.forEach(x => {
+    const ds = pick(x, ["Date","date"]);
     events.push({
       kind: "money",
-      date: dateStr,
-      sortDate: parseFlexibleDate(dateStr),
-      title: pick(x, ["Note", "note", "description", "Category", "category"]) || "Transaction",
-      meta: pick(x, ["Category", "category", "Subcategory", "subcategory"]),
-      amount: moneyValue(pick(x, ["Amount", "amount"]))
+      date: ds,
+      sort: parseDate(ds),
+      title: pick(x, ["Note","note","Category"]) || "Transaction",
+      meta: pick(x, ["Category","category"]),
+      amount: money(pick(x, ["Amount","amount"]))
     });
   });
 
-  // Sort newest first
-  events.sort((a, b) => {
-    const ta = a.sortDate ? a.sortDate.getTime() : 0;
-    const tb = b.sortDate ? b.sortDate.getTime() : 0;
-    return tb - ta;
-  });
-
+  events.sort((a,b) => (b.sort?.getTime()||0) - (a.sort?.getTime()||0));
   const filtered = events
     .filter(e => (e.title + " " + e.meta + " " + e.date).toLowerCase().includes(q))
-    .slice(0, 150);
+    .slice(0, 120);
 
-  const list = document.getElementById("timelineList");
-  list.innerHTML = filtered.length
+  const el = document.getElementById("tl");
+  el.innerHTML = filtered.length
     ? filtered.map(e => `
-        <div class="event">
-          <div class="icon">${e.kind === "music" ? "♫" : "₹"}</div>
+        <div class="event ${e.kind}">
+          <div class="mark">${e.kind === "music" ? "♫" : "₹"}</div>
           <div>
             <div class="title">${esc(e.title)}</div>
             <div class="meta">${esc(e.meta)}${e.meta && e.date ? " · " : ""}${esc(e.date)}</div>
           </div>
-          <div class="amount">${e.kind === "money" && e.amount ? "₹" + e.amount.toFixed(2) : ""}</div>
+          <div class="amt">${e.kind === "money" && e.amount ? "₹"+e.amount.toFixed(0) : ""}</div>
         </div>
       `).join("")
-    : '<div class="empty">No matching moments found.</div>';
+    : '<div class="empty">No matching moments.</div>';
 }
 
 /* ========== RECEIPT ========== */
-function renderReceipt() {
-  const dateInput = document.getElementById("receiptDate");
-  let targetKey = dateInput.value;
+function drawReceipt() {
+  const input = document.getElementById("rDate");
+  let key = input.value;
 
-  // If no date chosen, try to pick a day that has data
-  if (!targetKey) {
-    const candidates = [];
-    state.transactions.forEach(t => {
-      const d = parseFlexibleDate(pick(t, ["Date", "date"]));
-      if (d) candidates.push(toDateKey(d));
-    });
-    state.spotify.forEach(s => {
-      const d = parseFlexibleDate(pick(s, ["ts", "timestamp", "date"]));
-      if (d) candidates.push(toDateKey(d));
-    });
-    if (candidates.length) {
-      // Most recent
-      candidates.sort().reverse();
-      targetKey = candidates[0];
-      dateInput.value = targetKey;
+  if (!key) {
+    const keys = [];
+    state.tx.forEach(t => { const d = parseDate(pick(t,["Date","date"])); if (d) keys.push(dateKey(d)); });
+    state.spotify.forEach(s => { const d = parseDate(pick(s,["ts","timestamp","date"])); if (d) keys.push(dateKey(d)); });
+    if (keys.length) {
+      keys.sort().reverse();
+      key = keys[0];
+      input.value = key;
     }
   }
 
-  const dayTracks = state.spotify.filter(x => {
-    const d = parseFlexibleDate(pick(x, ["ts", "timestamp", "date"]));
-    return d && toDateKey(d) === targetKey;
+  const tracks = state.spotify.filter(x => {
+    const d = parseDate(pick(x,["ts","timestamp","date"]));
+    return d && dateKey(d) === key;
   });
-
-  const dayTx = state.transactions.filter(x => {
-    const d = parseFlexibleDate(pick(x, ["Date", "date"]));
-    return d && toDateKey(d) === targetKey;
+  const txs = state.tx.filter(x => {
+    const d = parseDate(pick(x,["Date","date"]));
+    return d && dateKey(d) === key;
   });
+  const total = txs.reduce((s,t) => s + money(pick(t,["Amount","amount"])), 0);
 
-  const totalSpend = dayTx.reduce((s, t) => s + moneyValue(pick(t, ["Amount", "amount"])), 0);
-
-  const displayDate = targetKey
-    ? new Date(targetKey + "T12:00:00").toLocaleDateString(undefined, {
-        weekday: "long", year: "numeric", month: "long", day: "numeric"
-      })
-    : "No date selected";
+  const pretty = key
+    ? new Date(key + "T12:00:00").toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" })
+    : "—";
 
   document.getElementById("receiptBox").innerHTML = `
-    <h2>Life Receipt</h2>
-    <div class="center">${esc(displayDate)}</div>
-    <div class="center" style="margin-top:4px">A reconstructed day from your digital traces</div>
-    <hr>
-    <div class="row"><b>🎵 Music</b><span>${dayTracks.length} play${dayTracks.length === 1 ? "" : "s"}</span></div>
-    ${dayTracks.slice(0, 8).map(x => `
-      <div class="row">
-        <span>${esc(pick(x, ["track_name", "master_metadata_track_name"]) || "Unknown track")}</span>
-        <span>${esc(pick(x, ["artist_name", "master_metadata_album_artist_name"]) || "")}</span>
+    <div class="receipt-head">
+      <div class="store">LIFE RECEIPTS</div>
+      <div class="sub">Personal archive · one day</div>
+    </div>
+    <div class="receipt-date">${esc(pretty)}</div>
+    <hr class="dash">
+    <div class="r-section">Music · ${tracks.length} play${tracks.length===1?"":"s"}</div>
+    ${tracks.slice(0,7).map(t => `
+      <div class="r-row">
+        <span class="left">${esc(pick(t,["track_name","track"])||"Unknown")}</span>
+        <span>${esc(pick(t,["artist_name","artist"])||"")}</span>
       </div>
     `).join("")}
-    ${dayTracks.length > 8 ? `<div class="row"><span style="color:var(--muted)">…and ${dayTracks.length - 8} more</span><span></span></div>` : ""}
-    ${dayTracks.length === 0 ? `<div class="row"><span style="color:var(--muted)">No listening recorded</span><span></span></div>` : ""}
-    <hr>
-    <div class="row"><b>₹ Spending</b><span>${dayTx.length} transaction${dayTx.length === 1 ? "" : "s"}</span></div>
-    ${dayTx.map(t => `
-      <div class="row">
-        <span>${esc(pick(t, ["Note", "note", "Category", "category"]) || "Transaction")}</span>
-        <b>₹${moneyValue(pick(t, ["Amount", "amount"])).toFixed(2)}</b>
+    ${tracks.length > 7 ? `<div class="r-row"><span class="left" style="color:var(--muted)">… +${tracks.length-7} more</span><span></span></div>` : ""}
+    ${tracks.length === 0 ? `<div class="r-row"><span class="left" style="color:var(--muted)">— no listening recorded —</span><span></span></div>` : ""}
+    <hr class="dash">
+    <div class="r-section">Spending · ${txs.length} item${txs.length===1?"":"s"}</div>
+    ${txs.map(t => `
+      <div class="r-row">
+        <span class="left">${esc(pick(t,["Note","note","Category"])||"Item")}</span>
+        <span>₹${money(pick(t,["Amount","amount"])).toFixed(0)}</span>
       </div>
     `).join("")}
-    ${dayTx.length === 0 ? `<div class="row"><span style="color:var(--muted)">No spending recorded</span><span></span></div>` : ""}
-    <hr>
-    <div class="row"><b>Total spent</b><b>₹${totalSpend.toFixed(2)}</b></div>
-    <hr>
-    <div class="center">Not everything important is a milestone.</div>
-    <div class="center" style="margin-top:8px;font-size:11px">Life Receipts</div>
+    ${txs.length === 0 ? `<div class="r-row"><span class="left" style="color:var(--muted)">— no spending recorded —</span><span></span></div>` : ""}
+    <hr class="dash">
+    <div class="r-total"><span>TOTAL</span><span>₹${total.toFixed(0)}</span></div>
+    <div class="r-stamp">Not everything important is a milestone.</div>
+    <div class="r-footer">Thank you for existing · Life Receipts</div>
   `;
 }
 
 /* ========== INIT ========== */
-function refreshAll() {
-  renderCharts();
-  renderTimeline();
-  renderReceipt();
+function refresh() {
+  drawCharts();
+  drawTimeline();
+  drawReceipt();
 }
 
 document.getElementById("today").textContent = new Date().toLocaleDateString(undefined, {
   weekday: "long", year: "numeric", month: "long", day: "numeric"
 });
 
-refreshAll();
+refresh();
 </script>
 </body>
 </html>
